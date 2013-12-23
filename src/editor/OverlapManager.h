@@ -54,9 +54,6 @@ static area_side NeighbourSide(Area* area, Area* neighbour)
 */
 
 
-class Mesh;
-
-
 namespace BALM {
 
 
@@ -963,20 +960,6 @@ private:
 			std::map<YTab*, tab_links<YTab> >& fYTabLinkMap;
 
 			std::vector<debug_info>	fDebugInfos;
-};
-
-
-class CDTEngine : public OverlapManagerEngine {
-public:
-								CDTEngine(BALMLayout* layout);
-
-	virtual void				DisconnectAreas();
-	virtual void				ConnectAreas();
-	virtual void				Draw(BView* view);
-
-private:
-			BALMLayout*			fALMLayout;
-			Mesh*				fMesh;
 };
 
 

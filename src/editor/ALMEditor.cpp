@@ -4,61 +4,18 @@
  */
 
 
-#include "editor/ALMEditor.h"
+#include "ALMEditor.h"
 
 #include <Autolock.h>
 #include <Window.h>
 
 #include <ALMLayout.h>
 
-#include <CustomizableNodeFactory.h>
-
-#include "CustomizableNodeView.h"
+#include "CustomizableNodeFactory.h"
 #include "EditorWindow.h"
 #include "LayoutArchive.h"
 #include "LayoutEditView.h"
 #include "OverlapManager.h"
-
-
-class LayerWindow : public BWindow
-{
-public:
-	LayerWindow(BALMEditor* editor, BALM::LayoutEditView* editView)
-		:
-		BWindow(BRect(350, 50, 1200, 700), "Layers", B_TITLED_WINDOW, 0),
-
-		fEditor(editor)
-	{
-		BALMLayout* layout = new BALMLayout(10.);
-		SetLayout(layout);
-		
-		fNodeView = new CustomizableNodeView(
-			CustomizableRoster::DefaultRoster());
-		layout->AddView(fNodeView, layout->Left(), layout->Top(),
-			layout->Right(), layout->Bottom());
-		
-		editView->StartWatching(fNodeView, kCustomizableSelected);
-		fNodeView->StartWatching(editView, kCustomizableSelected);
-	}
-
-	bool QuitRequested()
-	{
-		BMessage layout;
-		fNodeView->StoreLayout(&layout);
-		fEditor->SetLayerLayout(layout);
-		fEditor->StopEdit();
-		return true;
-	}
-
-	CustomizableNodeView* GetLayerView()
-	{
-		return fNodeView;
-	}
-
-private:
-			BALMEditor*			fEditor;
-			CustomizableNodeView* fNodeView;
-};
 
 
 BALMEditor::trash_item::trash_item(Customizable* customizable)
@@ -107,14 +64,6 @@ BALMEditor::StartEdit()
 	fEditWindow = new EditWindow(this, fEditView);
 	fEditWindow->Show();
 	fEditWindowMessenger = BMessenger(NULL, fEditWindow);
-
- 	if (fEnableLayerWindow) {
-		LayerWindow* layerWindow = new LayerWindow(this, fEditView);
-		fLayerWindow = layerWindow;
-		layerWindow->GetLayerView()->RestoreLayout(&fLayerLayout);
-		fLayerWindowMessenger = BMessenger(NULL, fLayerWindow);
-		fLayerWindow->Show();
- 	}
 }
 
 
@@ -125,7 +74,6 @@ BALMEditor::StopEdit()
 	BMessenger(fEditView).SendMessage(LayoutEditView::kQuitMsg);
 
 	fEditWindowMessenger.SendMessage(B_QUIT_REQUESTED);
-	fLayerWindowMessenger.SendMessage(B_QUIT_REQUESTED);
 }
 
 
@@ -270,20 +218,6 @@ BALMEditor::SetShowYTabs(bool show)
 }
 
 
-void
-BALMEditor::SetFreePlacement(bool freePlacement)
-{
-	fFreePlacement = freePlacement;
-}
-
-
-bool
-BALMEditor::FreePlacement()
-{
-	return fFreePlacement;
-}
-
-
 bool
 BALMEditor::ShowXTabs()
 {
@@ -295,13 +229,6 @@ bool
 BALMEditor::ShowYTabs()
 {
 	return fShowYTabs;
-}
-
-
-void
-BALMEditor::SetEnableLayerWindow(bool enabled)
-{
-	fEnableLayerWindow = enabled;
 }
 
 
