@@ -11,7 +11,6 @@
 #include <ALMLayoutBuilder.h>
 
 #include <ALMEditor.h>
-#include <PreviewWindow.h>
 
 
 using namespace BALM;
@@ -60,7 +59,6 @@ public:
 				SetSizeLimits(minSize.width, maxSize.width, minSize.height,
 					maxSize.height);
 
-				fPreviewWindowManager.NotifyLayoutEdited();
 				break;
 			}
 
@@ -73,8 +71,6 @@ private:
 			BALMLayout*			fLayout;
 
 			BALMEditor*			fEditor;
-
-			BALM::PreviewWindowManager	fPreviewWindowManager;
 };
 
 

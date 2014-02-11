@@ -218,6 +218,20 @@ BALMEditor::SetShowYTabs(bool show)
 }
 
 
+void
+BALMEditor::SetFreePlacement(bool freePlacement)
+{
+	fFreePlacement = freePlacement;
+}
+
+
+bool
+BALMEditor::FreePlacement()
+{
+	return fFreePlacement;
+}
+
+
 bool
 BALMEditor::ShowXTabs()
 {

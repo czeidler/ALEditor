@@ -43,15 +43,17 @@ SRCS= ALEditor.cpp \
 	src/charlemagne/PObjectBroker.cpp \
 	src/charlemagne/PProperty.cpp \
 	src/charlemagne/PValue.cpp \
-	src/components/CustomTypes.cpp src/components/UIComponents.cpp \
-	src/customization/Actions.cpp  src/customization/CustomizableEditView.cpp \
+	src/components/CustomTypes.cpp \
+	src/components/UIComponents.cpp \
+	src/customization/Actions.cpp \
 	src/customization/CustomizableRoster.cpp \
 	src/customization/CustomizableView.cpp \
 	src/customization/Object.cpp \
 	src/customization/Customizable.cpp \
 	src/customization/CustomizableNodeFactory.cpp  \
 	src/customization/CustomizableRosterView.cpp \
-	src/customization/Mangle.cpp src/customization/TrashView.cpp \
+	src/customization/Mangle.cpp \
+	src/customization/TrashView.cpp \
 	src/editor/ALMEditor.cpp \
 	src/editor/LayoutEditView.cpp \
 	src/editor/EditAction.cpp  \
@@ -61,8 +63,7 @@ SRCS= ALEditor.cpp \
 	src/editor/EditActionAreaDragging.cpp \
 	src/editor/EditActionResizing.cpp \
 	src/editor/EditorWindow.cpp \
-	src/editor/LayoutArchive.cpp \
-	src/haiku_private/Referenceable.cpp
+	src/editor/LayoutArchive.cpp
 
 #	specify the resource definition files to use
 #	full path or a relative path to the resource file can be used.
@@ -94,7 +95,7 @@ RSRCS=
 #		naming scheme you need to specify the path to the library
 #		and it's name
 #		library: my_lib.a entry: my_lib.a or path/my_lib.a
-LIBS= be $(STDCPPLIBS) alm
+LIBS= be $(STDCPPLIBS) alm tracker
 
 #	specify additional paths to directories following the standard
 #	libXXX.so or libXXX.a naming scheme.  You can specify full paths
@@ -107,7 +108,7 @@ LIBPATHS=/boot/home/config/non-packaged/lib
 #	additional paths to look for system headers
 #	thes use the form: #include <header>
 #	source file directories are NOT auto-included here
-SYSTEM_INCLUDE_PATHS =  headers/charlemagne headers/components  headers/customization headers/editor  headers/haiku_private headers/haiku_private/alm headers/haiku_private/linearspec
+SYSTEM_INCLUDE_PATHS =  headers/charlemagne headers/components  headers/customization headers/editor  headers/haiku_private headers/haiku_private/alm headers/haiku_private/linearspec /boot/system/develop/headers/private/interface /boot/system/develop/headers/private/shared
 
 #	additional paths to look for local headers
 #	thes use the form: #include "header"

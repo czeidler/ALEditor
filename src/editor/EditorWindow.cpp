@@ -27,18 +27,12 @@
 
 #include "Variable.h"
 
-#include "components/UIComponents.h"
+#include "UIComponents.h"
 #include "CustomizableRosterView.h"
 #include "CustomizableNodeFactory.h"
-#include "CustomizableNodeView.h"
 #include "LayoutArchive.h"
 #include "LayoutEditView.h"
-#include "PreviewWindow.h"
 #include "TrashView.h"
-
-
-const uint32 kMsgDecreaseWindowPreview = '&DeW';
-const uint32 kMsgEnlargeWindowPreview = '&PrW';
 
 
 using BALM::LayoutEditView;
@@ -731,10 +725,6 @@ EditWindow::_InitializeComponent()
 	fileMenu->AddItem(new BMenuItem("Load", new BMessage(kMsgLoadDialog)));
 	fileMenu->AddItem(new BMenuItem("Save", new BMessage(kMsgSaveDialog)));
 	fileMenu->AddSeparatorItem();
-	fileMenu->AddItem(new BMenuItem("Decrease Preview",
-		new BMessage(kMsgDecreaseWindowPreview)));
-	fileMenu->AddItem(new BMenuItem("Enlarge Preview",
-		new BMessage(kMsgEnlargeWindowPreview)));
 	fileMenu->AddSeparatorItem();
 	fileMenu->AddItem(new BMenuItem("Exit", new BMessage(B_QUIT_REQUESTED)));
 	
@@ -889,26 +879,6 @@ EditWindow::MessageReceived(BMessage* message)
 		case kMsgSaveDialog:
 			fSavePanel->Show();
 			break;
-
-		case kMsgDecreaseWindowPreview:
-		{
-			BWindow* window = fALMEngine->Owner()->Window();
-			window->LockLooper();
-			BSize size = fALMEngine->MinSize();
-			window->ResizeTo(size.width, size.height);
-			window->UnlockLooper();
-			break;	
-		}
-
-		case kMsgEnlargeWindowPreview:
-		{
-			BWindow* window = fALMEngine->Owner()->Window();
-			window->LockLooper();
-			BSize size = fALMEngine->PreferredSize();
-			window->ResizeTo(size.width, size.height);
-			window->UnlockLooper();
-			break;	
-		}
 
 		case kMsgClearLayout:
 		{

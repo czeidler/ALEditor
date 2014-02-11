@@ -36,6 +36,7 @@ class Row;
 class BALMEditor;
 class EditWindow;
 
+const int32 kCustomizableSelected = '&CuS';
 
 struct area_ref {
 	area_ref(Area* area) {

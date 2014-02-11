@@ -18,7 +18,6 @@
 
 #include "ALMEditor.h"
 #include "CustomizableNodeFactory.h"
-#include "CustomizableNodeView.h"
 #include "EditActionAreaDragging.h"
 #include "EditActionInserting.h"
 #include "EditActionMisc.h"

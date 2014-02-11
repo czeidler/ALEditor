@@ -9,9 +9,7 @@
 #include <Button.h>
 #include <ListView.h>
 
-#include <CustomizableRoster.h>
-
-#include <CustomizableEditView.h>
+#include "CustomizableRoster.h"
 
 
 namespace BALM {
@@ -44,7 +42,6 @@ private:
 			CustomizableRoster*	fRoster;
 
 			BListView*			fCustomizableListView;
-			CustomizableEditView*	fCustomizableEditView;
 			BButton*			fAddComponent;
 			BButton*			fRemoveComponent;
 };

@@ -106,10 +106,6 @@ CustomizableRosterView::CustomizableRosterView()
 	fRemoveComponent = new BButton("Remove", "Remove",
 		new BMessage(kMsgRemoveComponent));
 
-	fCustomizableEditView = new CustomizableEditView;
-	fCustomizableEditView->SetExplicitPreferredSize(BSize(B_SIZE_UNLIMITED,
-		B_SIZE_UNLIMITED));
-
 	BStringView* label = new BStringView("Components", "List of Components:");
 	BALMLayout* layout = new BALMLayout(5, 5);
 	BALMLayoutBuilder(this, layout)
@@ -121,9 +117,8 @@ CustomizableRosterView::CustomizableRosterView()
 				.AddToRight(fAddComponent)
 				.AddToRight(fRemoveComponent, layout->Right())
 			.Pop()
-			.AddBelow(fCustomizableListView, layout->AddYTab(),
-				layout->Left() ,layout->Right())
-			.AddBelow(fCustomizableEditView, layout->Bottom());
+			.AddBelow(fCustomizableListView, layout->Bottom(),
+				layout->Left() ,layout->Right());
 }
 
 
@@ -155,24 +150,6 @@ CustomizableRosterView::MessageReceived(BMessage* message)
 
 		case kMsgComponentSelected:
 		{
-			BArray<BWeakReference<Customizable> > allCustomizable;
-			fRoster->GetCustomizableList(allCustomizable);
-
-			int32 index = fCustomizableListView->CurrentSelection();
-			if (index < 0 || index >= (int32)allCustomizable.CountItems()) {
-				fCustomizableEditView->SetTo(NULL);
-				break;
-			}
-
-			BReference<Customizable> customizable= allCustomizable.ItemAt(index)
-				.GetReference();
-			if (customizable == NULL) {
-				fCustomizableEditView->SetTo(NULL);
-				break;
-			}
-
-			if (customizable == NULL)
-				fCustomizableEditView->SetTo(customizable);
 			break;
 		}
 

@@ -396,8 +396,8 @@ BObject::_GetEventConnections()
 		return fEventConnections;
 
 	EventConnections* eventConnections = new EventConnections;
-	if (atomic_test_and_set(reinterpret_cast<vint32*>(&fEventConnections),
-		reinterpret_cast<vint32>(eventConnections), 0) != 0)
+	if (atomic_test_and_set(reinterpret_cast<int32*>(&fEventConnections),
+		reinterpret_cast<int32>(eventConnections), 0) != 0)
 		delete eventConnections;
 	return fEventConnections;
 }
