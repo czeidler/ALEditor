@@ -725,7 +725,6 @@ EditWindow::_InitializeComponent()
 	fileMenu->AddItem(new BMenuItem("Load", new BMessage(kMsgLoadDialog)));
 	fileMenu->AddItem(new BMenuItem("Save", new BMessage(kMsgSaveDialog)));
 	fileMenu->AddSeparatorItem();
-	fileMenu->AddSeparatorItem();
 	fileMenu->AddItem(new BMenuItem("Exit", new BMessage(B_QUIT_REQUESTED)));
 	
 	fMainMenu->AddItem(fileMenu);
