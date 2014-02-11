@@ -1,5 +1,6 @@
 #include <Mangle.h>
 
+#include <cctype>
 #include <stdlib.h>
 
 
