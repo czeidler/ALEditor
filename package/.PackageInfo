@@ -1,0 +1,28 @@
+name			ALEditor
+version			1.0-1
+architecture		x86
+summary		"Auckland Layout Editor (ALE)"
+description		"Auckland Layout Editor (ALE)"
+packager		"Clemens Zeidler <czei002@aucklanduni.ac.nz>"
+vendor			"University of Auckland"
+licenses {
+	"MIT"
+}
+copyrights {
+	"Copyright (C) 1812-2013 by John Doe <test@example.com>"
+}
+provides {
+       ALEditor = 1.0
+	app:ALEditor = 1.0
+}
+requires {
+	haiku >= r1~alpha4_pm_hrev46213-1
+}
+urls {
+	"http://example.com/"
+}
+global-writable-files {
+}
+source-urls {
+	"Download <http://example.com/source.zip>"
+}
