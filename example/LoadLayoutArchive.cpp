@@ -22,11 +22,11 @@
 const char* kGUIFileName = "TestLayout";
 
 
-class LayoutArchiveWindow : public BWindow {
+class LoadLayoutArchiveWindow : public BWindow {
 public:
-	LayoutArchiveWindow(BRect frame) 
+	LoadLayoutArchiveWindow(BRect frame) 
 		:
-		BWindow(frame, "Layout Archive", B_TITLED_WINDOW, B_QUIT_ON_WINDOW_CLOSE
+		BWindow(frame, "Layout Loaded From Archive", B_TITLED_WINDOW, B_QUIT_ON_WINDOW_CLOSE
 			| B_AUTO_UPDATE_SIZE_LIMITS)
 	{
 		fLayout = new BALMLayout(10, 10);
@@ -86,7 +86,7 @@ main()
 {
 	BApplication app("application/x-vnd.haiku.ALELayoutArchive");
 
-	BWindow* window = new LayoutArchiveWindow(BRect(100, 100, 500, 350));
+	BWindow* window = new LoadLayoutArchiveWindow(BRect(100, 100, 500, 350));
 	window->Show();
 
 	app.Run();
