@@ -109,7 +109,7 @@ LIBPATHS=/boot/home/config/non-packaged/lib
 #	additional paths to look for system headers
 #	thes use the form: #include <header>
 #	source file directories are NOT auto-included here
-SYSTEM_INCLUDE_PATHS =  headers/charlemagne headers/components  headers/customization headers/editor  headers/haiku_private headers/haiku_private/alm headers/haiku_private/linearspec /boot/system/develop/headers/private/interface /boot/system/develop/headers/private/shared
+SYSTEM_INCLUDE_PATHS = headers/charlemagne headers/components  headers/customization headers/editor  headers/haiku_private headers/haiku_private/alm headers/haiku_private/linearspec /boot/system/develop/headers/private/interface /boot/system/develop/headers/private/shared
 
 #	additional paths to look for local headers
 #	thes use the form: #include "header"
