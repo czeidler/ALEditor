@@ -9,7 +9,7 @@ licenses {
 	"MIT"
 }
 copyrights {
-	"Copyright (C) 1812-2013 by John Doe <test@example.com>"
+	"Copyright (C) 2009-2014 by UniAuckland Team"
 }
 provides {
        ALEditor = 1.0
@@ -17,12 +17,4 @@ provides {
 }
 requires {
 	haiku >= r1~alpha4_pm_hrev46213-1
-}
-urls {
-	"http://example.com/"
-}
-global-writable-files {
-}
-source-urls {
-	"Download <http://example.com/source.zip>"
 }
