@@ -21,56 +21,19 @@ bool BALM::fuzzy_equal(float x1, float x2)
 	return false;
 }
 
-
-class InnerAreaTabs {
-public:
-	InnerAreaTabs(TabConnections* connections)
-		:
-		fConnections(connections)
-	{
-	}
-
-	XTab* FindHorizontalInnerTab(float pos, float tolerance, area_ref& area)
-	{
-		XTab* tab1;
-		float dist1 = _FindInnerTab<XTab, YTab, top_search>(pos, tolerance,
-			&tab1, area.top);
-
-		XTab* tab2;
-		float dist2 = _FindInnerTab<XTab, YTab, bottom_search>(pos, tolerance,
-			&tab2, area.bottom);
-
-		if (dist1 < dist2)
-			return tab1;
-		return tab2;
-	}
-
-	YTab* FindVerticalInnerTab(float pos, float tolerance, area_ref& area)
-	{
-		YTab* tab1;
-		float dist1 = _FindInnerTab<YTab, XTab, left_search>(pos, tolerance,
-			&tab1, area.left);
-
-		YTab* tab2;
-		float dist2 = _FindInnerTab<YTab, XTab, right_search>(pos, tolerance,
-			&tab2, area.right);
-
-		if (dist1 < dist2)
-			return tab1;
-		return tab2;
-	}
-
-private:
+// This function should be/was a member of SimpleOverlapEngine but gcc2 don't
+// likes template methods in classes (?). In gcc4 it works fine.
+namespace InnerAreaTabsHelper {
 	template<class TabType, class OrthTab, typename SearchDirection>
-	float _FindInnerTab(float pos, float tolerance, TabType** tab,
-		OrthTab* border)
+	float FindInnerTab(TabConnections *connections, float pos, float tolerance,
+		TabType** tab, OrthTab* border)
 	{
 		*tab = NULL;
 		float minDist = HUGE_VAL;
 
 		SearchDirection search;
 		std::map<OrthTab*, tab_links<OrthTab> >& linkMap
-			= search.LinkMap(fConnections);
+			= search.LinkMap(connections);
 		tab_links<OrthTab>& links = linkMap[border];
 
 		BObjectList<Area>& areas = search.AreasSearchDirection(links);
@@ -95,6 +58,45 @@ private:
 			}
 		}
 		return minDist;
+	}
+}
+	
+class InnerAreaTabs {
+public:
+	InnerAreaTabs(TabConnections* connections)
+		:
+		fConnections(connections)
+	{
+	}
+
+	XTab* FindHorizontalInnerTab(float pos, float tolerance, area_ref& area)
+	{
+		XTab* tab1;
+		float dist1 = InnerAreaTabsHelper::FindInnerTab<XTab, YTab, top_search>(
+			fConnections, pos, tolerance, &tab1, area.top);
+
+		XTab* tab2;
+		float dist2 = InnerAreaTabsHelper::FindInnerTab<XTab, YTab,
+			bottom_search>(fConnections, pos, tolerance, &tab2, area.bottom);
+
+		if (dist1 < dist2)
+			return tab1;
+		return tab2;
+	}
+
+	YTab* FindVerticalInnerTab(float pos, float tolerance, area_ref& area)
+	{
+		YTab* tab1;
+		float dist1 = InnerAreaTabsHelper::FindInnerTab<YTab, XTab,
+			left_search>(fConnections, pos, tolerance, &tab1, area.left);
+
+		YTab* tab2;
+		float dist2 = InnerAreaTabsHelper::FindInnerTab<YTab, XTab,
+			right_search>(fConnections, pos, tolerance,	&tab2, area.right);
+
+		if (dist1 < dist2)
+			return tab1;
+		return tab2;
 	}
 
 private:

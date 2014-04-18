@@ -321,6 +321,7 @@ private:
 			class DragAreaState;
 			class DragSwapState;
 			class DragMoveState;
+			class DragOutsideState;
 			class DragInsertState;
 			class DragBorderInsertState;
 			class ResizeState;
@@ -335,6 +336,7 @@ private:
 			friend class DragAreaState;
 			friend class DragSwapState;
 			friend class DragMoveState;
+			friend class DragOutsideState;
 			friend class DragInsertState;
 			friend class DragBorderInsertState;
 			friend class ResizeState;

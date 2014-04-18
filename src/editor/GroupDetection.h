@@ -349,7 +349,46 @@ struct bottom_search : vertical_search{
 	}
 };
 
-
+// These functions should be/ have been members of GroupDetection but gcc2 don't
+// likes template methods in classes (?). In gcc4 it works fine.
+namespace GroupDetectionHelper {
+	template<class SearchTab, typename SearchDirection, class OrthTab,
+		typename OrthDirection>
+		Area* _FindNeighbour(TabConnections *connections, SearchTab* tab,
+			Area* area)
+	{
+		SearchDirection search;
+		OrthDirection orthSearch;
+		tab_links<SearchTab>& tabLinks = orthSearch.LinkMap(connections)[tab];
+		tab_links<OrthTab>& areaLinks
+			= search.LinkMap(connections)[search.SearchTab(area)];
+	
+		BObjectList<Area>& tabAreas = orthSearch.AreasSearchDirection(tabLinks);
+		for (int32 i = 0; i < tabAreas.CountItems(); i++) {
+			Area* tabArea = tabAreas.ItemAt(i);
+			if (search.AreasSearchDirection(areaLinks).HasItem(tabArea))
+				return tabArea;
+		}
+	
+		return NULL;
+	}
+	
+	template<class SearchTab, typename SearchDirection, class OrthTab,
+		typename OrthDirection>
+	void CollectAllNeighbours(TabConnections *connections, SearchTab* tab,
+		Area* area,	BObjectList<Area>& areas)
+	{
+		while (true) {
+			Area* next = _FindNeighbour<SearchTab, SearchDirection, OrthTab,
+				OrthDirection>(connections, tab, area);
+			if (next == NULL)
+				break;
+			areas.AddItem(next);
+			area = next;
+		}
+	}
+}
+	
 /*! Find all areas that are connected.*/
 class GroupDetection {
 public:
@@ -479,35 +518,35 @@ public:
 		if (side == kBottom) {
 			YTab* tab = area->Bottom();
 			// left
-			_CollectAllNeighbours<YTab, left_search, XTab, top_search>(
-				tab, area, areas);
+			GroupDetectionHelper::CollectAllNeighbours<YTab, left_search, XTab,
+				top_search>(fConnections, tab, area, areas);
 			// right
-			_CollectAllNeighbours<YTab, right_search, XTab, top_search>(
-				tab, area, areas);
+			GroupDetectionHelper::CollectAllNeighbours<YTab, right_search, XTab,
+				top_search>(fConnections, tab, area, areas);
 		} else if (side == kTop) {
 			YTab* tab = area->Top();
 			// left
-			_CollectAllNeighbours<YTab, left_search, XTab, bottom_search>(
-				tab, area, areas);
+			GroupDetectionHelper::CollectAllNeighbours<YTab, left_search, XTab,
+				bottom_search>(fConnections, tab, area, areas);
 			// right
-			_CollectAllNeighbours<YTab, right_search, XTab, bottom_search>(
-				tab, area, areas);
+			GroupDetectionHelper::CollectAllNeighbours<YTab, right_search, XTab,
+				bottom_search>(fConnections, tab, area, areas);
 		} else if (side == kLeft) {
 			XTab* tab = area->Left();
 			// top
-			_CollectAllNeighbours<XTab, top_search, YTab, right_search>(
-				tab, area, areas);
+			GroupDetectionHelper::CollectAllNeighbours<XTab, top_search, YTab,
+				right_search>(fConnections, tab, area, areas);
 			// bottom
-			_CollectAllNeighbours<XTab, bottom_search, YTab, right_search>(
-				tab, area, areas);
+			GroupDetectionHelper::CollectAllNeighbours<XTab, bottom_search, YTab,
+				right_search>(fConnections, tab, area, areas);
 		} else if (side == kRight) {
 			XTab* tab = area->Right();
 			// top
-			_CollectAllNeighbours<XTab, top_search, YTab, left_search>(
-				tab, area, areas);
+			GroupDetectionHelper::CollectAllNeighbours<XTab, top_search, YTab,
+				left_search>(fConnections, tab, area, areas);
 			// bottom
-			_CollectAllNeighbours<XTab, bottom_search, YTab, left_search>(
-				tab, area, areas);
+			GroupDetectionHelper::CollectAllNeighbours<XTab, bottom_search, YTab,
+				left_search>(fConnections, tab, area, areas);
 		}
 	}
 
@@ -530,46 +569,139 @@ public:
 		}
 		return false;
 	}
-private:
-	template<class SearchTab, typename SearchDirection, class OrthTab,
-		typename OrthDirection>
-	Area* _FindNeighbour(SearchTab* tab, Area* area)
-	{
-		SearchDirection search;
-		OrthDirection orthSearch;
-		tab_links<SearchTab>& tabLinks = orthSearch.LinkMap(fConnections)[tab];
-		tab_links<OrthTab>& areaLinks
-			= search.LinkMap(fConnections)[search.SearchTab(area)];
-
-		BObjectList<Area>& tabAreas = orthSearch.AreasSearchDirection(tabLinks);
-		for (int32 i = 0; i < tabAreas.CountItems(); i++) {
-			Area* tabArea = tabAreas.ItemAt(i);
-			if (search.AreasSearchDirection(areaLinks).HasItem(tabArea))
-				return tabArea;
-		}
-
-		return NULL;
-	}
-
-	template<class SearchTab, typename SearchDirection, class OrthTab,
-		typename OrthDirection>
-	void _CollectAllNeighbours(SearchTab* tab, Area* area,
-		BObjectList<Area>& areas)
-	{
-		while (true) {
-			Area* next = _FindNeighbour<SearchTab, SearchDirection, OrthTab,
-				OrthDirection>(tab, area);
-			if (next == NULL)
-				break;
-			areas.AddItem(next);
-			area = next;
-		}
-	}
 
 private:
 			TabConnections*		fConnections;
 };
 
+// These functions should be/ have been members of InsertDetection but gcc2 don't
+// likes template methods in classes (?). In gcc4 it works fine.
+namespace InsertDetectionHelper {
+	template<class SearchTab, typename SearchDirection>
+	void _GetAllAreasFor(BALMLayout *layout, TabConnections* connections,
+		SearchTab* tab,	BObjectList<Area>& areaList)
+	{
+		// sometime tabs are at the same position so collect all of them
+		BObjectList<SearchTab> allTabs;
+		SearchDirection search;
+		for (int32 i = 0; i < search.CountTabs(layout); i++) {
+			SearchTab* currentTab = search.TabAt(layout, i);
+			if (fabs(tab->Value() - currentTab->Value()) < 0.1)
+				allTabs.AddItem(currentTab);
+		}
+		for (int32 i = 0; i < allTabs.CountItems(); i++) {
+			SearchTab* currentTab = allTabs.ItemAt(i);
+			tab_links<SearchTab>& tabLinks
+				= search.LinkMap(connections)[currentTab];
+			BObjectList<Area>& tabAreas = search.AreasSearchDirection(tabLinks);
+			areaList.AddList(&tabAreas);
+		}
+	}
+	
+	template<class SearchTab, typename SearchDirection, class OrthTab>
+	void _FindInsertTabs(BALMLayout *layout, TabConnections* connections,
+		SearchTab* tab, BRect targetFrame, OrthTab** tab1, OrthTab** tab2,
+		BObjectList<Area>& tabAreas)
+	{
+		SearchDirection search;
+		float middle = search.OrthSide1(targetFrame)
+			+ search.OrthExtent(targetFrame) / 2;
+	
+		float tab1MinDist = DBL_MAX;
+		float tab2MinDist = DBL_MAX;
+	
+		_GetAllAreasFor<SearchTab, SearchDirection>(layout, connections, tab,
+			tabAreas);
+		for (int32 i = 0; i < tabAreas.CountItems(); i++) {
+			Area* area = tabAreas.ItemAt(i);
+	
+			OrthTab* currentTab1 = search.OrthTab1(area);
+			float currentDist1 = fabs(search.OrthSide1(targetFrame)
+				- currentTab1->Value());
+			if (currentDist1 < tab1MinDist && currentTab1->Value() < middle) {
+				tab1MinDist = currentDist1;
+				*tab1 = currentTab1;
+			}
+	
+			OrthTab* currentTab2 = search.OrthTab2(area);
+			float currentDist2 = fabs(currentTab2->Value()
+				- search.OrthSide2(targetFrame));
+			if (currentDist2 < tab2MinDist  && currentTab2->Value() > middle) {
+				tab2MinDist = currentDist2;
+				*tab2 = currentTab2;
+			}
+		}
+	
+		if ((*tab1) == NULL || (*tab2) == NULL) {
+			*tab1 = NULL;
+			*tab2 = NULL;
+			return;
+		}
+		if ((*tab1)->Value() > search.OrthSide2(targetFrame)
+			|| (*tab2)->Value() < search.OrthSide1(targetFrame)) {
+			*tab1 = NULL;
+			*tab2 = NULL;
+		}
+	}
+	
+	template<class SearchTab, typename SearchDirection, class OrthTab>
+	void _FillAreasBetween(SearchTab* tab, OrthTab* tab1, OrthTab* tab2,
+		BArray<Area*>& areaList, const BObjectList<Area>& areaCandidates)
+	{
+		SearchDirection search;
+		for (int32 i = 0; i < areaCandidates.CountItems(); i++) {
+			Area* area = areaCandidates.ItemAt(i);
+	
+			OrthTab* currentTab1 = search.OrthTab1(area);
+			OrthTab* currentTab2 = search.OrthTab2(area);
+			if (tab1->Value() <= currentTab1->Value()
+				&& currentTab2->Value() <= tab2->Value())
+				areaList.AddItem(area);
+		}
+	}
+			
+	template<class SearchTab, class OrthTab, typename SearchDirection1,
+		typename SearchDirection2>
+	void GetInsertAreas(BALMLayout *layout, TabConnections* connections,
+		SearchTab* tab, BRect targetFrame, BArray<Area*>& areaList,
+		area_side& insertDirection)
+	{
+		areaList.MakeEmpty();
+	
+		OrthTab* tab11 = NULL;
+		OrthTab* tab12 = NULL;
+		BObjectList<Area> areaCandidates1;
+		_FindInsertTabs<SearchTab, SearchDirection1, OrthTab>(layout,
+			connections, tab, targetFrame, &tab11, &tab12, areaCandidates1);
+		OrthTab* tab21 = NULL;
+		OrthTab* tab22 = NULL;
+		BObjectList<Area> areaCandidates2;
+		_FindInsertTabs<SearchTab, SearchDirection2, OrthTab>(layout,
+			connections, tab, targetFrame, &tab21, &tab22, areaCandidates2);
+		if ((tab21 == NULL || tab22 == NULL)
+			&& (tab11 == NULL || tab12 == NULL))
+			return;
+	
+		float extent = SearchDirection1().Extent(targetFrame);
+	
+		float diff1 = DBL_MAX;
+		if (tab11 != NULL && tab12 != NULL)
+			diff1 = fabs((tab12->Value() - tab11->Value()) - extent);
+		float diff2 = DBL_MAX;
+		if (tab21 != NULL && tab22 != NULL)
+			diff2 = fabs((tab22->Value() - tab21->Value()) - extent);
+	
+		if (diff1 < diff2) {
+			_FillAreasBetween<SearchTab, SearchDirection1, OrthTab>(tab, tab11,
+				tab12, areaList, areaCandidates1);
+			insertDirection = SearchDirection1().SearchDirection();
+		} else {
+			_FillAreasBetween<SearchTab, SearchDirection2, OrthTab>(tab, tab21,
+				tab22, areaList, areaCandidates2);
+			insertDirection = SearchDirection2().SearchDirection();
+		}
+	}
+}
 
 class InsertDetection {
 public:
@@ -583,139 +715,17 @@ public:
 	void GetInsertAreas(XTab* tab, BRect targetFrame, BArray<Area*>& areaList,
 		area_side& insertDirection)
 	{
-		GetInsertAreas<XTab, YTab, left_search, right_search>(tab, targetFrame,
-			areaList, insertDirection);
+		InsertDetectionHelper::GetInsertAreas<XTab, YTab, left_search,
+			right_search>(fLayout, fConnections, tab, targetFrame, areaList,
+				insertDirection);
 	}
 
 	void GetInsertAreas(YTab* tab, BRect targetFrame, BArray<Area*>& areaList,
 		area_side& insertDirection)
 	{
-		GetInsertAreas<YTab, XTab, top_search, bottom_search>(tab, targetFrame,
-			areaList, insertDirection);
-	}
-
-	template<class SearchTab, class OrthTab, typename SearchDirection1,
-		typename SearchDirection2>
-	void GetInsertAreas(SearchTab* tab, BRect targetFrame,
-		BArray<Area*>& areaList, area_side& insertDirection)
-	{
-		areaList.MakeEmpty();
-
-		OrthTab* tab11 = NULL;
-		OrthTab* tab12 = NULL;
-		BObjectList<Area> areaCandidates1;
-		FindInsertTabs<SearchTab, SearchDirection1, OrthTab>(tab, targetFrame,
-			&tab11, &tab12, areaCandidates1);
-		OrthTab* tab21 = NULL;
-		OrthTab* tab22 = NULL;
-		BObjectList<Area> areaCandidates2;
-		FindInsertTabs<SearchTab, SearchDirection2, OrthTab>(tab, targetFrame,
-			&tab21, &tab22, areaCandidates2);
-		if ((tab21 == NULL || tab22 == NULL)
-			&& (tab11 == NULL || tab12 == NULL))
-			return;
-
-		float extent = SearchDirection1().Extent(targetFrame);
-
-		float diff1 = DBL_MAX;
-		if (tab11 != NULL && tab12 != NULL)
-			diff1 = fabs((tab12->Value() - tab11->Value()) - extent);
-		float diff2 = DBL_MAX;
-		if (tab21 != NULL && tab22 != NULL)
-			diff2 = fabs((tab22->Value() - tab21->Value()) - extent);
-
-		if (diff1 < diff2) {
-			FillAreasBetween<SearchTab, SearchDirection1, OrthTab>(tab, tab11,
-				tab12, areaList, areaCandidates1);
-			insertDirection = SearchDirection1().SearchDirection();
-		} else {
-			FillAreasBetween<SearchTab, SearchDirection2, OrthTab>(tab, tab21,
-				tab22, areaList, areaCandidates2);
-			insertDirection = SearchDirection2().SearchDirection();
-		}
-	}
-
-	template<class SearchTab, typename SearchDirection, class OrthTab>
-	void FindInsertTabs(SearchTab* tab, BRect targetFrame, OrthTab** tab1,
-		OrthTab** tab2, BObjectList<Area>& tabAreas)
-	{
-		SearchDirection search;
-		float middle = search.OrthSide1(targetFrame)
-			+ search.OrthExtent(targetFrame) / 2;
-
-		float tab1MinDist = DBL_MAX;
-		float tab2MinDist = DBL_MAX;
-
-		_GetAllAreasFor<SearchTab, SearchDirection>(tab,
-			tabAreas);
-		for (int32 i = 0; i < tabAreas.CountItems(); i++) {
-			Area* area = tabAreas.ItemAt(i);
-
-			OrthTab* currentTab1 = search.OrthTab1(area);
-			float currentDist1 = fabs(search.OrthSide1(targetFrame)
-				- currentTab1->Value());
-			if (currentDist1 < tab1MinDist && currentTab1->Value() < middle) {
-				tab1MinDist = currentDist1;
-				*tab1 = currentTab1;
-			}
-
-			OrthTab* currentTab2 = search.OrthTab2(area);
-			float currentDist2 = fabs(currentTab2->Value()
-				- search.OrthSide2(targetFrame));
-			if (currentDist2 < tab2MinDist  && currentTab2->Value() > middle) {
-				tab2MinDist = currentDist2;
-				*tab2 = currentTab2;
-			}
-		}
-
-		if ((*tab1) == NULL || (*tab2) == NULL) {
-			*tab1 = NULL;
-			*tab2 = NULL;
-			return;
-		}
-		if ((*tab1)->Value() > search.OrthSide2(targetFrame)
-			|| (*tab2)->Value() < search.OrthSide1(targetFrame)) {
-			*tab1 = NULL;
-			*tab2 = NULL;
-		}
-	}
-
-	template<class SearchTab, typename SearchDirection, class OrthTab>
-	void FillAreasBetween(SearchTab* tab, OrthTab* tab1, OrthTab* tab2,
-		BArray<Area*>& areaList, const BObjectList<Area>& areaCandidates)
-	{
-		SearchDirection search;
-		for (int32 i = 0; i < areaCandidates.CountItems(); i++) {
-			Area* area = areaCandidates.ItemAt(i);
-
-			OrthTab* currentTab1 = search.OrthTab1(area);
-			OrthTab* currentTab2 = search.OrthTab2(area);
-			if (tab1->Value() <= currentTab1->Value()
-				&& currentTab2->Value() <= tab2->Value())
-				areaList.AddItem(area);
-		}
-	}
-
-private:
-
-	template<class SearchTab, typename SearchDirection>
-	void _GetAllAreasFor(SearchTab* tab, BObjectList<Area>& areaList)
-	{
-		// sometime tabs are at the same position so collect all of them
-		BObjectList<SearchTab> allTabs;
-		SearchDirection search;
-		for (int32 i = 0; i < search.CountTabs(fLayout); i++) {
-			SearchTab* currentTab = search.TabAt(fLayout, i);
-			if (fabs(tab->Value() - currentTab->Value()) < 0.1)
-				allTabs.AddItem(currentTab);
-		}
-		for (int32 i = 0; i < allTabs.CountItems(); i++) {
-			SearchTab* currentTab = allTabs.ItemAt(i);
-			tab_links<SearchTab>& tabLinks
-				= search.LinkMap(fConnections)[currentTab];
-			BObjectList<Area>& tabAreas = search.AreasSearchDirection(tabLinks);
-			areaList.AddList(&tabAreas);
-		}
+		InsertDetectionHelper::GetInsertAreas<YTab, XTab, top_search,
+			bottom_search>(fLayout, fConnections, tab, targetFrame, areaList,
+				insertDirection);
 	}
 
 private:

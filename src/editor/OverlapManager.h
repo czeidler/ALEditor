@@ -65,14 +65,30 @@ struct tab_links {
 	BObjectList<Area> areas2;
 };
 
+// This function should be/was a member of TabConnections but gcc2 don't likes
+// template methods in classes (?). In gcc4 it works fine.
+namespace TabConnectionsHelper {
+	template <class TabType, class DirectionPolicy>
+	void FillTabLinks(BALMLayout* layout, std::map<TabType*,
+		tab_links<TabType> >& tabMap) {
+		DirectionPolicy policy;
+		for (int32 i = 0; i < policy.CountTabs(layout); i++) {
+			TabType* tab = policy.TabAt(layout, i);
+			tab_links<TabType>& links = tabMap[tab];
+			policy.FillLinks(layout, tab, links);
+		}
+	};
+}
 
 class TabConnections {
 public:
 	void Fill(BALMLayout* layout)
 	{
 		Clear();
-		_FillTabLinks<XTab, HorizontalPolicy>(layout, fXTabLinkMap);
-		_FillTabLinks<YTab, VerticalPolicy>(layout, fYTabLinkMap);
+		TabConnectionsHelper::FillTabLinks<XTab, HorizontalPolicy>(layout,
+			fXTabLinkMap);
+		TabConnectionsHelper::FillTabLinks<YTab, VerticalPolicy>(layout,
+			fYTabLinkMap);
 	}
 
 
@@ -364,17 +380,6 @@ private:
 		}
 	};
 
-	template <class TabType, class DirectionPolicy>
-	void _FillTabLinks(BALMLayout* layout, std::map<TabType*,
-		tab_links<TabType> >& tabMap) {
-		DirectionPolicy policy;
-		for (int32 i = 0; i < policy.CountTabs(layout); i++) {
-			TabType* tab = policy.TabAt(layout, i);
-			tab_links<TabType>& links = tabMap[tab];
-			policy.FillLinks(layout, tab, links);
-		}
-	};
-
 private:
 			std::map<XTab*, tab_links<XTab> > fXTabLinkMap;
 			std::map<YTab*, tab_links<YTab> > fYTabLinkMap;
@@ -442,7 +447,50 @@ private:
 			TabConnections		fTabConnections;
 };
 
-
+// This function should be/was a member of SimpleOverlapEngine but gcc2 don't
+// likes template methods in classes (?). In gcc4 it works fine.
+namespace SimpleOverlapEngineHelper {
+	template <class TYPE>
+	TYPE* FindClosestConnectedTab(TYPE* start, TYPE* target,
+		std::map<TYPE*, tab_links<TYPE> >& tabMap,
+		bool leftOrUpDirection, float& minDist)
+	{
+		TYPE* foundTab = start;
+		tab_links<TYPE>& links = tabMap[start];
+		if (leftOrUpDirection) {
+			minDist = start->Value() - target->Value();
+			for (int32 i = 0; i < links.tabs1.CountItems(); i++) {
+				TYPE* tab = links.tabs1.ItemAt(i);
+				float dist = tab->Value() - target->Value();
+				if (dist <= 0)
+					continue;
+				TYPE* nextTab = FindClosestConnectedTab(tab, target, tabMap,
+					leftOrUpDirection, dist);
+				if (dist < minDist) {
+					foundTab = nextTab;
+					minDist = dist;
+				}
+			}
+		} else {
+			minDist = target->Value() - start->Value();
+			for (int32 i = 0; i < links.tabs2.CountItems(); i++) {
+				TYPE* tab = links.tabs2.ItemAt(i);
+				float dist = target->Value() - tab->Value();
+				if (dist <= 0)
+					continue;
+				TYPE* nextTab = FindClosestConnectedTab(tab, target, tabMap,
+					leftOrUpDirection, dist);
+				if (dist < minDist) {
+					foundTab = nextTab;
+					minDist = dist;
+				}
+			}
+		}
+	
+		return foundTab;
+	}
+}
+	
 class SimpleOverlapEngine : public OverlapManagerEngine {
 public:
 	SimpleOverlapEngine(BALMLayout* layout, OverlapManager* manager)
@@ -497,7 +545,7 @@ public:
 				if (distLeft <= distTop && distLeft <= distRight
 					&& distLeft <= distBottom) {
 					float dist;
-					XTab* closestTab = _FindClosestConnectedTab<XTab>(
+					XTab* closestTab = SimpleOverlapEngineHelper::FindClosestConnectedTab<XTab>(
 						area->Left(), closestArea->Right(), fXTabLinkMap, true,
 						dist);
 					/* Check if the found tab is already insert at the other
@@ -523,7 +571,7 @@ public:
 				} else if (distTop <= distLeft && distTop <= distRight
 					&& distTop <= distBottom) {
 					float dist;
-					YTab* closestTab = _FindClosestConnectedTab<YTab>(
+					YTab* closestTab = SimpleOverlapEngineHelper::FindClosestConnectedTab<YTab>(
 						area->Top(), closestArea->Bottom(), fYTabLinkMap, true,
 						dist);
 					tab_links<YTab>& links = fYTabLinkMap[closestArea->Bottom()];
@@ -547,7 +595,7 @@ public:
 				} else if (distRight <= distTop && distRight <= distLeft
 					&& distRight <= distBottom) {
 					float dist;
-					XTab* closestTab = _FindClosestConnectedTab<XTab>(
+					XTab* closestTab = SimpleOverlapEngineHelper::FindClosestConnectedTab<XTab>(
 						area->Right(), closestArea->Left(), fXTabLinkMap, false,
 						dist);
 					tab_links<XTab>& links = fXTabLinkMap[closestArea->Left()];
@@ -571,7 +619,7 @@ public:
 				} else if (distBottom <= distTop && distBottom <= distRight
 					&& distBottom <= distLeft) {
 					float dist;
-					YTab* closestTab = _FindClosestConnectedTab<YTab>(
+					YTab* closestTab = SimpleOverlapEngineHelper::FindClosestConnectedTab<YTab>(
 						area->Bottom(), closestArea->Top(), fYTabLinkMap, false,
 						dist);
 
@@ -777,47 +825,6 @@ private:
 		fDebugInfos.push_back(info);
 	}
 
-	template <class TYPE>
-	TYPE* _FindClosestConnectedTab(TYPE* start, TYPE* target,
-		std::map<TYPE*, tab_links<TYPE> >& tabMap,
-		bool leftOrUpDirection, float& minDist)
-	{
-		TYPE* foundTab = start;
-		tab_links<TYPE>& links = tabMap[start];
-		if (leftOrUpDirection) {
-			minDist = start->Value() - target->Value();
-			for (int32 i = 0; i < links.tabs1.CountItems(); i++) {
-				TYPE* tab = links.tabs1.ItemAt(i);
-				float dist = tab->Value() - target->Value();
-				if (dist <= 0)
-					continue;
-				TYPE* nextTab = _FindClosestConnectedTab(tab, target, tabMap,
-					leftOrUpDirection, dist);
-				if (dist < minDist) {
-					foundTab = nextTab;
-					minDist = dist;
-				}
-			}
-		} else {
-			minDist = target->Value() - start->Value();
-			for (int32 i = 0; i < links.tabs2.CountItems(); i++) {
-				TYPE* tab = links.tabs2.ItemAt(i);
-				float dist = target->Value() - tab->Value();
-				if (dist <= 0)
-					continue;
-				TYPE* nextTab = _FindClosestConnectedTab(tab, target, tabMap,
-					leftOrUpDirection, dist);
-				if (dist < minDist) {
-					foundTab = nextTab;
-					minDist = dist;
-				}
-			}
-		}
-
-		return foundTab;
-	}
-
-
 	void _GetDistances(Area* main, Area* other, float& distLeft, float& distTop,
 		float& distRight, float& distBottom)
 	{
@@ -846,7 +853,6 @@ private:
 		else if (distBottom < 0)
 			distBottom = B_SIZE_UNLIMITED;
 	}
-
 
 	Area* _FindClosestArea(Area* area, const BObjectList<Area>& areas)
 	{

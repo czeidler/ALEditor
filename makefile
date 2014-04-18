@@ -54,6 +54,7 @@ SRCS= ALEditor.cpp \
 	src/customization/CustomizableRosterView.cpp \
 	src/customization/Mangle.cpp \
 	src/customization/TrashView.cpp \
+	src/editor/AreaRemoval.cpp \
 	src/editor/ALMEditor.cpp \
 	src/editor/LayoutEditView.cpp \
 	src/editor/EditAction.cpp  \
