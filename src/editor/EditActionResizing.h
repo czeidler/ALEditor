@@ -324,7 +324,7 @@ public:
 				xTab = NULL;
 		}
 		if (xTab == NULL)
-			return NULL;
+			return false;
 
 		fConnectToTab = fView->fALMEngine->IndexOf(xTab, true);
 		// and test if solvable
@@ -478,7 +478,7 @@ public:
 				yTab = NULL;
 		}
 		if (yTab == NULL)
-			return NULL;
+			return false;
 
 		fConnectToTab = fView->fALMEngine->IndexOf(yTab, true);
 		// and test if solvable

@@ -2,8 +2,6 @@
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
  */
-
-
 #include "InfoSystem.h"
 
 
