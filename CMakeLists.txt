@@ -46,4 +46,8 @@ add_library(ale SHARED
 )
 
 add_executable(ALEditor ALEditor.cpp)
+ADD_CUSTOM_COMMAND(TARGET ALEditor COMMAND rc -o ALEditor.rsrc ${CMAKE_CURRENT_SOURCE_DIR}/res/ALEditor.rdef COMMENT "Compiling resources")
+ADD_CUSTOM_COMMAND(TARGET ALEditor COMMAND xres -o ALEditor ALEditor.rsrc COMMENT "Adding resources to executable")
+ADD_CUSTOM_COMMAND(TARGET ALEditor COMMAND mimeset --all ALEditor COMMENT "Adjusting MIME types")
+
 target_link_libraries(ALEditor ${CORELIBS} be alm tracker ale)
