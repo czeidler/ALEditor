@@ -19,7 +19,7 @@
 #include <LayoutArchive.h>
 
 
-const char* kGUIFileName = "TestLayout";
+const char* kGUIFileName = "test.layout";
 
 
 class LoadLayoutArchiveWindow : public BWindow {
@@ -37,7 +37,7 @@ public:
 		_FindGUISpecifications(kGUIFileName, guiFile);
 
 		LayoutArchive layoutArchive(fLayout);
-		if (layoutArchive.RestoreFromAttribute(&guiFile, "layout") != B_OK) {
+		if (layoutArchive.RestoreFromFile(&guiFile) != B_OK) {
 			BString text = "Can't find layout specification file: \"";
 			text << kGUIFileName;
 			text << "\"";

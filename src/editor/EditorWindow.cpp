@@ -899,7 +899,7 @@ EditWindow::MessageReceived(BMessage* message)
 			BFile file(&entry, B_READ_ONLY);
 
 			if (fEditView->LockLooper()) {
-				fEditor->RestoreFromAttribute(&file, "layout");
+				fEditor->RestoreFromFile(&file);
 
 				UpdateEditWindow();
 				fEditView->UnlockLooper();
@@ -923,7 +923,7 @@ EditWindow::MessageReceived(BMessage* message)
 				BMessage archive;
 				LayoutArchive archiver(fALMEngine);
 				archiver.SaveLayout(&archive, true);
-				archiver.SaveToAttribute(&file, "layout", &archive);
+				archiver.SaveToFile(&file, &archive);
 				fEditView->InvalidateLayout();
 				fEditView->Invalidate();
 
