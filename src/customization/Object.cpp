@@ -396,7 +396,11 @@ BObject::_GetEventConnections()
 		return fEventConnections;
 
 	EventConnections* eventConnections = new EventConnections;
+#if LONG_MAX == INT_MAX
 	if (atomic_test_and_set(reinterpret_cast<int32*>(&fEventConnections),
+#else
+	if (atomic_test_and_set(reinterpret_cast<int64*>(&fEventConnections),
+#endif
 		reinterpret_cast<int32>(eventConnections), 0) != 0)
 		delete eventConnections;
 	return fEventConnections;
