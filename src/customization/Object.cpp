@@ -396,8 +396,14 @@ BObject::_GetEventConnections()
 		return fEventConnections;
 
 	EventConnections* eventConnections = new EventConnections;
+#ifdef __HAIKU_ARCH_64_BIT
+	if (atomic_test_and_set64(reinterpret_cast<int64*>(&fEventConnections),
+		reinterpret_cast<int64>(eventConnections), 0) != 0)
+#else
 	if (atomic_test_and_set(reinterpret_cast<int32*>(&fEventConnections),
 		reinterpret_cast<int32>(eventConnections), 0) != 0)
+#endif
 		delete eventConnections;
+
 	return fEventConnections;
 }
