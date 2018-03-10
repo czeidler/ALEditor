@@ -844,6 +844,16 @@ EditWindow::_SetTabAreaContent(BView* view)
 	BALMLayout* layout = (BALMLayout*)fAreaView->GetLayout();
 	BLayoutItem* item = layout->ItemAt(0);
 	if (item != NULL) {
+		BLayout* childLayout = dynamic_cast<BLayout*>(item);
+		if (childLayout) {
+			for (int i = childLayout->CountItems() -1; i >= 0; --i) {
+				BLayoutItem* child = childLayout->ItemAt(i);
+				if (child) {
+					childLayout->RemoveItem(child);
+					delete child;
+				}
+			}
+		}
 		layout->RemoveItem(item);
 		delete item;
 	}
