@@ -1157,12 +1157,12 @@ StrokeRect(areaFrame);
 	} else if (dynamic_cast<BLayout*>(item) != NULL)
 		region.Exclude(item->Frame());
 
-	const int8 shade = 240;
+	const uint8 shade = 240;
 	rgb_color backgoundColor = {shade, shade, shade};
 	SetHighColor(backgoundColor);
 	FillRegion(&region);
 
-	const int8 shadeDark = 220;
+	const uint8 shadeDark = 220;
 	rgb_color borderColor = {shadeDark, shadeDark, shadeDark};
 	SetHighColor(borderColor);
 	StrokeRect(region.Frame());
