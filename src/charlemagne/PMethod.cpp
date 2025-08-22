@@ -136,15 +136,27 @@ PMethod::Run(PObject *object, PArgs &in, PArgs &out, void *extra)
 
 
 PMethodInterface::PMethodInterface(void)
-	:	fIn(20, true),
-		fOut(20, true)
+	:
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	fIn(20),
+	fOut(20)
+#else
+	fIn(20, true),
+	fOut(20, true)
+#endif
 {
 }
 
 
 PMethodInterface::PMethodInterface(const PMethodInterface &from)
-	:	fIn(20, true),
-		fOut(20, true)
+	:
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	fIn(20),
+	fOut(20)
+#else
+	fIn(20, true),
+	fOut(20, true)
+#endif
 {
 	*this = from;
 }

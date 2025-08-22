@@ -6,14 +6,22 @@ PData::PData(void)
 	:	fType("PData"),
 		fFriendlyType("Generic Data Container")
 {
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	fPropertyList = new BObjectList<PropertyData, true>(20);
+#else
 	fPropertyList = new BObjectList<PropertyData>(20,true);
+#endif
 }
 
 
 PData::PData(BMessage *msg)
 	:	fType("PData")
 {
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	fPropertyList = new BObjectList<PropertyData, true>(20);
+#else
 	fPropertyList = new BObjectList<PropertyData>(20,true);
+#endif
 	
 	if (msg->FindString("type",&fType) != B_OK)
 		fType = "PData";
@@ -35,14 +43,22 @@ PData::PData(BMessage *msg)
 PData::PData(const char *name)
 	:	fType("PData")
 {
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	fPropertyList = new BObjectList<PropertyData, true>(20);
+#else
 	fPropertyList = new BObjectList<PropertyData>(20,true);
+#endif
 }
 
 
 PData::PData(const PData &from)
 	:	fType("PData")
 {
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	fPropertyList = new BObjectList<PropertyData, true>(20);
+#else
 	fPropertyList = new BObjectList<PropertyData>(20,true);
+#endif
 	*this = from;
 }
 

@@ -339,7 +339,11 @@ class ListValue : public PValue
 public:
 							ListValue(void);
 							ListValue(const ListValue &from);
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+							ListValue(BObjectList<PValue, true> from);
+#else
 							ListValue(BObjectList<PValue> from);
+#endif
 							~ListValue(void);
 		
 		virtual bool		AcceptsType(char *type);
@@ -352,8 +356,13 @@ public:
 		virtual	PValue *	Duplicate(void) const;
 		
 		inline	ListValue &	operator=(const ListValue &from);
-		
-				BObjectList<PValue>	*value;
+
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+				BObjectList<PValue, true>
+#else
+				BObjectList<PValue>
+#endif
+							*value;
 };
 
 PValue *	CreatePValue(const char *type);

@@ -1242,23 +1242,39 @@ MessageValue::Duplicate(void) const
 
 ListValue::ListValue(void)
 {
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	value = new BObjectList<PValue, true>(20);
+#else
 	value = new BObjectList<PValue>(20, true);
+#endif
 	*type = "list";
 }
 
 ListValue::ListValue(const ListValue &from)
 {
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	value = new BObjectList<PValue, true>(20);
+#else
 	value = new BObjectList<PValue>(20, true);
+#endif
 	*type = "list";
 	*this = from;
 }
 
 
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+ListValue::ListValue(BObjectList<PValue, true> from)
+{
+	value = new BObjectList<PValue, true>(20);
+	*type = "list";
+}
+#else
 ListValue::ListValue(BObjectList<PValue> from)
 {
 	value = new BObjectList<PValue>(20, true);
 	*type = "list";
 }
+#endif
 
 
 ListValue::~ListValue(void)

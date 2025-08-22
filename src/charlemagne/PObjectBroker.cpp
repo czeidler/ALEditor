@@ -48,8 +48,13 @@ PObjectBroker::PObjectBroker(void)
 		fQuitting(false),
 		pApp(NULL)
 {
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	fObjectList = new BObjectList<PObject, true>(20);
+	fObjInfoList = new BObjectList<PObjectInfo, true>(20);
+#else
 	fObjectList = new BObjectList<PObject>(20,true);
 	fObjInfoList = new BObjectList<PObjectInfo>(20,true);
+#endif
 	
 /*	fObjInfoList->AddItem(new PObjectInfo("PObject","Generic Object",PObject::Instantiate,
 											PObject::Create));
