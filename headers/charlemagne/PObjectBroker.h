@@ -54,9 +54,14 @@ public:
 			void		MessageReceived(BMessage *msg);
 	
 private:
-	
+
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	BObjectList<PObject, true>		*fObjectList;
+	BObjectList<PObjectInfo, true>	*fObjInfoList;
+#else
 	BObjectList<PObject>		*fObjectList;
 	BObjectList<PObjectInfo>	*fObjInfoList;
+#endif
 	
 	PObjectInfo *		FindObjectInfo(const char *type);
 	

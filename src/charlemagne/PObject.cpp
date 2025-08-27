@@ -9,11 +9,19 @@ PObject::PObject(void)
 	:	fType("PObject"),
 		fFriendlyType("Generic Object")
 {
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	fPropertyList = new BObjectList<PropertyData, true>(20);
+	fInheritedList = new BObjectList<PMethod, true>(20);
+	fInterfaceList = new BObjectList<BString, true>(20);
+	fMethodList = new BObjectList<PMethod, true>(20);
+	fEventList = new BObjectList<EventData, true>(20);
+#else
 	fPropertyList = new BObjectList<PropertyData>(20,true);
 	fInheritedList = new BObjectList<PMethod>(20,true);
 	fInterfaceList = new BObjectList<BString>(20,true);
 	fMethodList = new BObjectList<PMethod>(20,true);
 	fEventList = new BObjectList<EventData>(20,true);
+#endif
 	
 	PObjectBroker::RegisterObject(this);
 	
@@ -25,12 +33,20 @@ PObject::PObject(void)
 PObject::PObject(BMessage *msg)
 	:	fType("PObject")
 {
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	fPropertyList = new BObjectList<PropertyData, true>(20);
+	fInheritedList = new BObjectList<PMethod, true>(20);
+	fInterfaceList = new BObjectList<BString, true>(20);
+	fMethodList = new BObjectList<PMethod, true>(20);
+	fEventList = new BObjectList<EventData, true>(20);
+#else
 	fPropertyList = new BObjectList<PropertyData>(20,true);
 	fInheritedList = new BObjectList<PMethod>(20,true);
 	fInterfaceList = new BObjectList<BString>(20,true);
 	fMethodList = new BObjectList<PMethod>(20,true);
 	fEventList = new BObjectList<EventData>(20,true);
-	
+#endif
+
 	PObjectBroker::RegisterObject(this);
 	if (msg->FindString("type",&fType) != B_OK)
 		fType = "PObject";
@@ -56,12 +72,20 @@ PObject::PObject(BMessage *msg)
 PObject::PObject(const char *name)
 	:	fType("PObject")
 {
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	fPropertyList = new BObjectList<PropertyData, true>(20);
+	fInheritedList = new BObjectList<PMethod, true>(20);
+	fInterfaceList = new BObjectList<BString, true>(20);
+	fMethodList = new BObjectList<PMethod, true>(20);
+	fEventList = new BObjectList<EventData, true>(20);
+#else
 	fPropertyList = new BObjectList<PropertyData>(20,true);
 	fInheritedList = new BObjectList<PMethod>(20,true);
 	fInterfaceList = new BObjectList<BString>(20,true);
 	fMethodList = new BObjectList<PMethod>(20,true);
 	fEventList = new BObjectList<EventData>(20,true);
-	
+#endif
+
 	PObjectBroker::RegisterObject(this);
 	AddProperty(new IntProperty("ObjectID", GetID(), "Unique identifier of the object"),
 				PROPERTY_READ_ONLY);
@@ -72,12 +96,20 @@ PObject::PObject(const char *name)
 PObject::PObject(const PObject &from)
 	:	fType("PObject")
 {
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	fPropertyList = new BObjectList<PropertyData, true>(20);
+	fInheritedList = new BObjectList<PMethod, true>(20);
+	fInterfaceList = new BObjectList<BString, true>(20);
+	fMethodList = new BObjectList<PMethod, true>(20);
+	fEventList = new BObjectList<EventData, true>(20);
+#else
 	fPropertyList = new BObjectList<PropertyData>(20,true);
 	fInheritedList = new BObjectList<PMethod>(20,true);
 	fInterfaceList = new BObjectList<BString>(20,true);
 	fMethodList = new BObjectList<PMethod>(20,true);
 	fEventList = new BObjectList<EventData>(20,true);
-	
+#endif
+
 	PObjectBroker::RegisterObject(this);
 	*this = from;
 }

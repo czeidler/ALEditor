@@ -119,11 +119,19 @@ protected:
 private:
 	friend class PObjectBroker;
 	uint64						fObjectID;
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	BObjectList<PropertyData, true>	*fPropertyList;
+	BObjectList<PMethod, true>		*fMethodList;
+	BObjectList<PMethod, true>		*fInheritedList;
+	BObjectList<BString, true>		*fInterfaceList;
+	BObjectList<EventData, true>	*fEventList;
+#else
 	BObjectList<PropertyData>	*fPropertyList;
 	BObjectList<PMethod>		*fMethodList;
 	BObjectList<PMethod>		*fInheritedList;
 	BObjectList<BString>		*fInterfaceList;
 	BObjectList<EventData>		*fEventList;
+#endif
 };
 
 // Convenience functions

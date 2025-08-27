@@ -322,8 +322,13 @@ public:
 	
 private:
 	PMetaProperty *		FindProperty(const char *type);
-	
-	BObjectList<PMetaProperty>	fPropertyList;
+
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	BObjectList<PMetaProperty, true>
+#else
+	BObjectList<PMetaProperty>
+#endif
+						fPropertyList;
 };
 
 extern PropertyRoster gPropertyRoster;

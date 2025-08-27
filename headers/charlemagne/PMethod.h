@@ -93,8 +93,13 @@ public:
 			int32			FindReturnValue(const char *name) const;
 			
 private:
-	BObjectList<PMethodInterfaceData>	fIn,
-										fOut;
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	BObjectList<PMethodInterfaceData, true>
+#else
+	BObjectList<PMethodInterfaceData>
+#endif
+							fIn,
+							fOut;
 };
 
 

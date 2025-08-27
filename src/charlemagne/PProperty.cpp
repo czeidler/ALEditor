@@ -1294,7 +1294,12 @@ MessageProperty::GetValueAsString(void) const
 
 
 PropertyRoster::PropertyRoster(void)
-	:	fPropertyList(20, true)
+	:
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	fPropertyList(20)
+#else
+	fPropertyList(20, true)
+#endif
 {
 	fPropertyList.AddItem(new PMetaProperty("PProperty",PProperty::Instantiate,PProperty::Create));
 	fPropertyList.AddItem(new PMetaProperty("StringProperty",StringProperty::Instantiate,
