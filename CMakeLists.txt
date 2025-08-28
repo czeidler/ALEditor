@@ -45,6 +45,8 @@ add_library(ale SHARED
 	src/editor/LayoutArchive.cpp
 )
 
+target_link_libraries(ale shared)
+
 add_executable(ALEditor ALEditor.cpp)
 ADD_CUSTOM_COMMAND(TARGET ALEditor POST_BUILD
 	COMMAND rc -o ALEditor.rsrc ${CMAKE_CURRENT_SOURCE_DIR}/res/ALEditor.rdef
